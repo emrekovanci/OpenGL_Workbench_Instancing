@@ -52,14 +52,14 @@ void PostProcess::initShader()
 	};
 	glUniform2fv(glGetUniformLocation(_shader.getProgramId(), "offsets"), 9, reinterpret_cast<const float*>(offsets));
 
-	// init blur kernel
-	const float blur_kernel[9] =
+	// sharpen
+	const float kernel[9] =
 	{
 		0.0f, -1.0f, 0.0f,
 		-1.0f, 5.0f, -1.0f,
 		0.0f, -1.0f, 0.0f
 	};
-	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "blur_kernel"), 9, blur_kernel);
+	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "kernel"), 9, kernel);
 }
 
 PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height) :

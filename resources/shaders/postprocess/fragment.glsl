@@ -5,7 +5,7 @@ out vec4 Color;
 
 uniform sampler2D scene;
 uniform vec2 offsets[9];
-uniform float blur_kernel[9];
+uniform float kernel[9];
 
 void main()
 {
@@ -20,7 +20,7 @@ void main()
 	vec4 resultColor = vec4(0.0);
 	for (int j = 0; j < 9; ++j)
 	{
-		resultColor += vec4(samples[j] * blur_kernel[j], 0.0);
+		resultColor += vec4(samples[j] * kernel[j], 0.0);
 	}
 	resultColor.a = 1.0;
 
