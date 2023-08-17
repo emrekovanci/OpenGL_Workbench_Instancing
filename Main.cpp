@@ -9,9 +9,11 @@
 #include <Core/Shader.hpp>
 #include <Core/Camera.hpp>
 #include <Core/FrameRateCounter.hpp>
+#include <Core/PostProcess.hpp>
 
 #include <Math/Graph.hpp>
 
+constexpr unsigned int AntiAliasingLevel = 4;
 constexpr float CameraDistance = 3.0f;
 
 std::vector<glm::mat4> ModelMatrices;
@@ -26,7 +28,6 @@ void updateModelBuffer(GLuint modelBuffer)
 
 void render(GLuint vao)
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(vao);
@@ -39,7 +40,7 @@ int main()
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    settings.antialiasingLevel = 4;
+    // settings.antialiasingLevel = 4;
     settings.majorVersion = 3;
     settings.minorVersion = 3;
 
@@ -65,8 +66,12 @@ int main()
         100.0f
     );
 
-    Shader shader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
-    shader.use();
+    // blinn-pong shader
+    Shader litShader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
+
+    // post-process shader
+    Shader postProcessShader("resources/shaders/postprocess/vertex.glsl", "resources/shaders/postprocess/fragment.glsl");
+    PostProcess postProcess(postProcessShader, window.getSize().x, window.getSize().y);
 
     std::vector<Vertex> vertexPositions
     {
@@ -138,7 +143,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
     glBindVertexArray(vao);
-    GLuint modelMatrixLocation = shader.getAttribLocation("instanceMatrix");
+    GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
     {
         const int offset = i + modelMatrixLocation;
@@ -154,8 +159,7 @@ int main()
     float currentTime = 0.0f;
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
+    // glEnable(GL_MULTISAMPLE);
 
     while (window.isOpen())
     {
@@ -163,27 +167,33 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) { window.close(); }
-            if (event.type == sf::Event::Resized) { glViewport(0, 0, event.size.width, event.size.height); }
+            // if (event.type == sf::Event::Resized) { glViewport(0, 0, event.size.width, event.size.height); }
         }
 
         // timing
         currentTime = clock.getElapsedTime().asSeconds();
         const float deltaTime = currentTime - previousTime;
         previousTime = currentTime;
+
+        // simulate
         fpsCounter.update(deltaTime);
+        graph.update(deltaTime);
+        updateModelBuffer(modelBuffer);
 
         // camera
         camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * CameraDistance;
 
-        // shader properties
-        shader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
-        shader.setVec3("ViewPosition", camera.Position);
-        shader.setMat4("View", camera.getViewMatrix());
-        shader.setMat4("Projection", projectionMatrix);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        graph.update(deltaTime);
-        updateModelBuffer(modelBuffer);
+        postProcess.begin();
+        litShader.use();
+        litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
+        litShader.setVec3("ViewPosition", camera.Position);
+        litShader.setMat4("View", camera.getViewMatrix());
+        litShader.setMat4("Projection", projectionMatrix);
         render(vao);
+        postProcess.end();
+        postProcess.render();
 
         std::cout << '\r' << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
 

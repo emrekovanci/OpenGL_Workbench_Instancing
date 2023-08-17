@@ -9,6 +9,10 @@ set(SRC
     ${SRCROOT}/FrameRateCounter.cpp
     ${INCROOT}/Shader.hpp
     ${SRCROOT}/Shader.cpp
+    ${INCROOT}/Texture2D.hpp
+    ${SRCROOT}/Texture2D.cpp
+    ${INCROOT}/PostProcess.hpp
+    ${SRCROOT}/PostProcess.cpp
 )
 
 add_library(CoreLibrary STATIC ${SRC})
