@@ -69,7 +69,7 @@ int main()
     );
 
     // blinn-pong shader
-    Shader litShader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
+    Shader litShader("resources/shaders/lit/vertex.glsl", "resources/shaders/lit/fragment.glsl");
 
     // post-process shader
     Shader postProcessShader("resources/shaders/postprocess/vertex.glsl", "resources/shaders/postprocess/fragment.glsl");
