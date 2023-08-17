@@ -81,13 +81,8 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
 
 void PostProcess::setSize(unsigned int width, unsigned height)
 {
-	// reset fbo texture
 	_fboTexture.reset(new Texture2D(width, height, nullptr));
-
-	// reset renderbuffer
 	_renderBuffer.reset(new RenderBuffer(width, height));
-
-	// reset framebuffer
 	_frameBuffer.reset(new FrameBuffer());
 	_frameBuffer->bind();
 	_frameBuffer->attachColorBuffer(*_fboTexture);
