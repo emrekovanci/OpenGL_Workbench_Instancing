@@ -16,7 +16,7 @@ void main()
 		samples[i] = vec3(texture(scene, TexCoords.st + offsets[i]));
 	}
 
-	// apply blur
+	// apply kernel
 	vec4 resultColor = vec4(0.0);
 	for (int j = 0; j < 9; ++j)
 	{
