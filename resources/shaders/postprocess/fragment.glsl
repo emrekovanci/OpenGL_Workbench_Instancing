@@ -26,8 +26,9 @@ vec4 applyImageKernel(vec3 samples[KERNEL_ELEMENT_COUNT])
 
 void main()
 {
-	vec3 samples[9];
-	for (int i = 0; i < 9; ++i)
+	vec3 samples[KERNEL_ELEMENT_COUNT];
+
+	for (int i = 0; i < KERNEL_ELEMENT_COUNT; ++i)
 	{
 		samples[i] = vec3(texture(Scene, TexCoords.st + Offsets[i]));
 	}
