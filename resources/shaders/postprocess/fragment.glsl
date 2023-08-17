@@ -7,22 +7,27 @@ uniform sampler2D scene;
 uniform vec2 offsets[9];
 uniform float kernel[9];
 
+vec4 applyImageKernel(vec3 samples[9])
+{
+	vec4 result = vec4(0.0);
+
+	for (int i = 0; i < 9; ++i)
+	{
+		result += vec4(samples[i] * kernel[i], 0.0);
+	}
+
+	result.a = 1.0;
+
+	return result;
+}
+
 void main()
 {
-	// prepare samples
 	vec3 samples[9];
 	for (int i = 0; i < 9; ++i)
 	{
 		samples[i] = vec3(texture(scene, TexCoords.st + offsets[i]));
 	}
 
-	// apply kernel
-	vec4 resultColor = vec4(0.0);
-	for (int j = 0; j < 9; ++j)
-	{
-		resultColor += vec4(samples[j] * kernel[j], 0.0);
-	}
-	resultColor.a = 1.0;
-
-	Color = resultColor;
+	Color = applyImageKernel(samples);
 }
