@@ -55,9 +55,9 @@ void PostProcess::initShader()
 	// init blur kernel
 	const float blur_kernel[9] =
 	{
-		1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f,
-		2.0f / 16.0f, 4.0f / 16.0f, 2.0f / 16.0f,
-		1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f
+		0.0f, -1.0f, 0.0f,
+		-1.0f, 5.0f, -1.0f,
+		0.0f, -1.0f, 0.0f
 	};
 	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "blur_kernel"), 9, blur_kernel);
 }
