@@ -1,4 +1,4 @@
-#include <Core/PostProcess.hpp>
+#include <Graphics/PostProcess.hpp>
 
 #include <iostream>
 #include <vector>
@@ -65,32 +65,42 @@ void PostProcess::initShader()
 PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height) :
     _shader { shader },
     _width { width },
-    _height { height }
+    _height { height },
+	_fboTexture { std::make_unique<Texture2D>() },
+	_frameBuffer { std::make_unique<FrameBuffer>() },
+	_renderBuffer { std::make_unique<RenderBuffer>(width, height) }
 {
-	_fboTexture.generate(width, height, nullptr);
+	_fboTexture->generate(width, height, nullptr);
 
-	glGenFramebuffers(1, &_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _fboTexture.Id, 0);
-
-	glGenRenderbuffers(1, &_rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, _rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, _rbo);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	_frameBuffer->bind();
+	_frameBuffer->attachColorBuffer(*_fboTexture);
+	_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
+	_frameBuffer->unbind();
 
 	initVao();
 	initShader();
 }
 
-void PostProcess::prepareBuffers(unsigned int width, unsigned height)
+void PostProcess::setSize(unsigned int width, unsigned height)
 {
+	// reset fbo texture
+	_fboTexture.reset(new Texture2D());
+	_fboTexture->generate(width, height, nullptr);
+
+	// reset renderbuffer
+	_renderBuffer.reset(new RenderBuffer(width, height));
+
+	// reset framebuffer
+	_frameBuffer.reset(new FrameBuffer());
+	_frameBuffer->bind();
+	_frameBuffer->attachColorBuffer(*_fboTexture);
+	_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
+	_frameBuffer->unbind();
 }
 
 void PostProcess::begin()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+	_frameBuffer->bind();
 
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -104,12 +114,12 @@ void PostProcess::render()
 	_shader.use();
 
 	glBindVertexArray(_vao);
-		_fboTexture.bind();
+		_fboTexture->bind();
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 }
 
 void PostProcess::end()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	_frameBuffer->unbind();
 }

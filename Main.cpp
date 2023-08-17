@@ -9,9 +9,10 @@
 #include <Core/Shader.hpp>
 #include <Core/Camera.hpp>
 #include <Core/FrameRateCounter.hpp>
-#include <Core/PostProcess.hpp>
 
 #include <Math/Graph.hpp>
+
+#include <Graphics/PostProcess.hpp>
 
 constexpr unsigned int AntiAliasingLevel = 4;
 constexpr float CameraDistance = 3.0f;
@@ -167,7 +168,11 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed) { window.close(); }
-            // if (event.type == sf::Event::Resized) { glViewport(0, 0, event.size.width, event.size.height); }
+            if (event.type == sf::Event::Resized)
+            {
+                glViewport(0, 0, event.size.width, event.size.height);
+                postProcess.setSize(event.size.width, event.size.height);
+            }
         }
 
         // timing

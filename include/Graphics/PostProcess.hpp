@@ -2,6 +2,8 @@
 
 #include <Core/Shader.hpp>
 #include <Core/Texture2D.hpp>
+#include <Core/Buffers/FrameBuffer.hpp>
+#include <Core/Buffers/RenderBuffer.hpp>
 
 #include <memory>
 
@@ -13,7 +15,7 @@ private:
 
 public:
     PostProcess(const Shader& shader, unsigned int width, unsigned int height);
-    void prepareBuffers(unsigned int width, unsigned height);
+    void setSize(unsigned int width, unsigned height);
 
     void begin();
     void render();
@@ -24,9 +26,10 @@ private:
     unsigned int _width;
     unsigned int _height;
 
-    Texture2D _fboTexture {};
-    unsigned int _fbo {};
-    unsigned int _rbo {};
-    unsigned int _vbo {};
-    unsigned int _vao {};
+    std::unique_ptr<Texture2D> _fboTexture;
+    std::unique_ptr<FrameBuffer> _frameBuffer;
+    std::unique_ptr<RenderBuffer> _renderBuffer;
+
+    unsigned int _vbo;
+    unsigned int _vao;
 };
