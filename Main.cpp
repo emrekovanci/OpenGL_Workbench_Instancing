@@ -27,13 +27,13 @@ void updateModelBuffer(GLuint modelBuffer)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void render(GLuint vao)
+void render(const std::vector<Vertex>& vertices, GLuint vao)
 {
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, graph.getGraphResolution());
+    glDrawArraysInstanced(GL_TRIANGLES, 0, vertices.size(), graph.getGraphResolution());
     glBindVertexArray(0);
 }
 
@@ -75,7 +75,7 @@ int main()
     Shader postProcessShader("resources/shaders/postprocess/vertex.glsl", "resources/shaders/postprocess/fragment.glsl");
     PostProcess postProcess(postProcessShader, window.getSize().x, window.getSize().y);
 
-    std::vector<Vertex> vertexPositions
+    std::vector<Vertex> vertices
     {
         // back face
         { { -0.5f, -0.5f, -0.5f }, { 0.0f,  0.0f, -1.0f } },
@@ -133,7 +133,7 @@ int main()
     GLuint positionBuffer;
     glGenBuffers(1, &positionBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(Vertex), vertexPositions.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
     glEnableVertexAttribArray(1);
@@ -197,7 +197,7 @@ int main()
         litShader.setMat4("Projection", projectionMatrix);
 
         postProcess.begin();
-        render(vao);
+        render(vertices, vao);
         postProcess.end();
         postProcess.render();
 
