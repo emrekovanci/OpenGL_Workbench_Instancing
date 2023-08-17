@@ -34,7 +34,7 @@ void PostProcess::initVao()
 void PostProcess::initShader()
 {
 	_shader.use();
-	_shader.setInt("scene", 0);
+	_shader.setInt("Scene", 0);
 
 	// init offsets
 	const float offset = 1.0f / 300.0f;
@@ -50,7 +50,7 @@ void PostProcess::initShader()
 		{  0.0f,   -offset  },  // bottom-center
 		{  offset, -offset  }   // bottom-right
 	};
-	glUniform2fv(glGetUniformLocation(_shader.getProgramId(), "offsets"), 9, reinterpret_cast<const float*>(offsets));
+	glUniform2fv(glGetUniformLocation(_shader.getProgramId(), "Offsets"), 9, reinterpret_cast<const float*>(offsets));
 
 	// sharpen
 	const float kernel[9] =
@@ -59,7 +59,7 @@ void PostProcess::initShader()
 		-1.0f, 5.0f, -1.0f,
 		0.0f, -1.0f, 0.0f
 	};
-	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "kernel"), 9, kernel);
+	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "Kernel"), 9, kernel);
 }
 
 PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height) :
