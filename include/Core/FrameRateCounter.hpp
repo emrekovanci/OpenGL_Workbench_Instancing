@@ -1,6 +1,5 @@
 #pragma once
 
-#include <limits>
 #include <string>
 
 class FrameRateCounter

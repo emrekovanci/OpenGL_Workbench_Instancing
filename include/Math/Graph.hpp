@@ -1,8 +1,8 @@
 #pragma once
 
-#include <glm/ext/matrix_transform.hpp>
+#include <Math/MathEffectSelector.hpp>
 
-#include "MathEffectSelector.hpp"
+#include <glm/ext/matrix_transform.hpp>
 
 class Graph
 {

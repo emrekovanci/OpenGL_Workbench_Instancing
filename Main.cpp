@@ -5,11 +5,12 @@
 #include <SFML/Window.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "Vertex.hpp"
-#include "Shader.hpp"
-#include "Camera.hpp"
-#include "Graph.hpp"
-#include "FrameRateCounter.hpp"
+#include <Core/Vertex.hpp>
+#include <Core/Shader.hpp>
+#include <Core/Camera.hpp>
+#include <Core/FrameRateCounter.hpp>
+
+#include <Math/Graph.hpp>
 
 constexpr float CameraDistance = 3.0f;
 

@@ -1,4 +1,4 @@
-#include "Graph.hpp"
+#include <Math/Graph.hpp>
 
 void Graph::startTransition()
 {

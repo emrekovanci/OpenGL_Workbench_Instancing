@@ -1,9 +1,10 @@
-#include "Shader.hpp"
+#include <Core/Shader.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <iterator>
 
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 void checkCompileErrors(GLuint shader, std::string type)

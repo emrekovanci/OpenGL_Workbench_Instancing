@@ -1,4 +1,4 @@
-#include "MathEffect.hpp"
+#include <Math/MathEffect.hpp>
 
 #include <glm/common.hpp>
 #include <glm/exponential.hpp>

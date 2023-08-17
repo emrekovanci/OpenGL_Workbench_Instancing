@@ -1,9 +1,9 @@
 #pragma once
 
+#include <Math/MathEffect.hpp>
+
 #include <functional>
 #include <vector>
-
-#include "MathEffect.hpp"
 
 class MathEffectSelector
 {

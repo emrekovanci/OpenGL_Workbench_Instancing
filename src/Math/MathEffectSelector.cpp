@@ -1,4 +1,4 @@
-#include "MathEffectSelector.hpp"
+#include <Math/MathEffectSelector.hpp>
 
 std::vector<EffectFunction> MathEffectSelector::_functions =
 {
