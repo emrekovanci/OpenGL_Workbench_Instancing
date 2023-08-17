@@ -101,9 +101,6 @@ void PostProcess::setSize(unsigned int width, unsigned height)
 void PostProcess::begin()
 {
 	_frameBuffer->bind();
-
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void PostProcess::render()

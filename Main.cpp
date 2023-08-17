@@ -29,6 +29,7 @@ void updateModelBuffer(GLuint modelBuffer)
 
 void render(GLuint vao)
 {
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(vao);
@@ -41,7 +42,7 @@ int main()
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    // settings.antialiasingLevel = 4;
+    //settings.antialiasingLevel = 4;
     settings.majorVersion = 3;
     settings.minorVersion = 3;
 
@@ -161,6 +162,7 @@ int main()
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
     // glEnable(GL_MULTISAMPLE);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     while (window.isOpen())
     {
@@ -188,14 +190,13 @@ int main()
         // camera
         camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * CameraDistance;
 
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-        postProcess.begin();
         litShader.use();
         litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
         litShader.setVec3("ViewPosition", camera.Position);
         litShader.setMat4("View", camera.getViewMatrix());
         litShader.setMat4("Projection", projectionMatrix);
+
+        postProcess.begin();
         render(vao);
         postProcess.end();
         postProcess.render();
