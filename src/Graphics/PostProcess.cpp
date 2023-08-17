@@ -66,12 +66,10 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
     _shader { shader },
     _width { width },
     _height { height },
-	_fboTexture { std::make_unique<Texture2D>() },
+	_fboTexture { std::make_unique<Texture2D>(width, height, nullptr) },
 	_frameBuffer { std::make_unique<FrameBuffer>() },
 	_renderBuffer { std::make_unique<RenderBuffer>(width, height) }
 {
-	_fboTexture->generate(width, height, nullptr);
-
 	_frameBuffer->bind();
 	_frameBuffer->attachColorBuffer(*_fboTexture);
 	_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
@@ -84,8 +82,7 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
 void PostProcess::setSize(unsigned int width, unsigned height)
 {
 	// reset fbo texture
-	_fboTexture.reset(new Texture2D());
-	_fboTexture->generate(width, height, nullptr);
+	_fboTexture.reset(new Texture2D(width, height, nullptr));
 
 	// reset renderbuffer
 	_renderBuffer.reset(new RenderBuffer(width, height));

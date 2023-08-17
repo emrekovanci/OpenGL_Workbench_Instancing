@@ -4,10 +4,9 @@
 
 struct Texture2D
 {
-    Texture2D();
+    Texture2D(unsigned int width, unsigned int height, unsigned char* data);
     ~Texture2D();
 
-    void generate(unsigned int width, unsigned int height, unsigned char* data);
     void bind() const;
     void unbind() const;
 
