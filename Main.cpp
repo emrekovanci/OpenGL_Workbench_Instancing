@@ -20,6 +20,16 @@ constexpr float CameraDistance = 3.0f;
 std::vector<glm::mat4> ModelMatrices;
 Graph graph(&ModelMatrices);
 
+void displayGpuInfo()
+{
+    std::cout
+        << "---------------------------------------------\n"
+        << "Vendor:  \t" << glGetString(GL_VENDOR)   << '\n'
+        << "Version: \t" << glGetString(GL_VERSION)  << '\n'
+        << "Renderer:\t" << glGetString(GL_RENDERER) << '\n'
+        << "---------------------------------------------\n";
+}
+
 void updateModelBuffer(GLuint modelBuffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
@@ -54,10 +64,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    std::cout << "Vendor:" << glGetString(GL_VENDOR) << '\n';
-    std::cout << "Version:" << glGetString(GL_VERSION) << '\n';
-    std::cout << "Renderer:" << glGetString(GL_RENDERER) << '\n';
-    std::cout << "-----------\n";
+    displayGpuInfo();
 
     Camera camera;
 
