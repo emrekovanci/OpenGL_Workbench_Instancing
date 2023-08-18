@@ -71,6 +71,8 @@ float Graph::normalizeCoord(int axisValue) const
 
 Graph::Graph(ModelMatrices* modelMatrices) : _modelMatrices { modelMatrices }
 {
+    _modelMatrices->reserve(_cubesPerGraph);
+
     for (int i = 0; i < _cubesPerGraph; ++i)
     {
         _modelMatrices->push_back(glm::mat4(1.0f));
