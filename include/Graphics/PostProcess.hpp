@@ -18,7 +18,7 @@ public:
     void setSize(unsigned int width, unsigned height);
 
     void begin();
-    void render();
+    void render(int mouseX);
     void end();
 
 private:
@@ -26,9 +26,12 @@ private:
     unsigned int _width;
     unsigned int _height;
 
+    std::unique_ptr<Texture2D> _multiSampledColorBuffer;
+    std::unique_ptr<RenderBuffer> _multiSampledRenderBuffer;
+    std::unique_ptr<FrameBuffer> _intermediateFrameBuffer;
+
     std::unique_ptr<Texture2D> _fboTexture;
     std::unique_ptr<FrameBuffer> _frameBuffer;
-    std::unique_ptr<RenderBuffer> _renderBuffer;
 
     unsigned int _vbo;
     unsigned int _vao;

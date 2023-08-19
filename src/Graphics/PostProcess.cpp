@@ -66,14 +66,20 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
     _shader { shader },
     _width { width },
     _height { height },
+	_multiSampledColorBuffer { std::make_unique<Texture2D>(width, height, nullptr, 8) },
+	_multiSampledRenderBuffer { std::make_unique<RenderBuffer>(width, height, 8) },
+	_intermediateFrameBuffer{ std::make_unique<FrameBuffer>() },
 	_fboTexture { std::make_unique<Texture2D>(width, height, nullptr) },
-	_frameBuffer { std::make_unique<FrameBuffer>() },
-	_renderBuffer { std::make_unique<RenderBuffer>(width, height) }
+	_frameBuffer { std::make_unique<FrameBuffer>() }
 {
 	_frameBuffer->bind();
-	_frameBuffer->attachColorBuffer(*_fboTexture);
-	_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
+	_frameBuffer->attachColorBuffer(*_multiSampledColorBuffer);
+	_frameBuffer->attachDepthStencilBuffer(*_multiSampledRenderBuffer);
 	_frameBuffer->unbind();
+
+	_intermediateFrameBuffer->bind();
+	_intermediateFrameBuffer->attachColorBuffer(*_fboTexture);
+	_intermediateFrameBuffer->unbind();
 
 	initVao();
 	initShader();
@@ -81,13 +87,13 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
 
 void PostProcess::setSize(unsigned int width, unsigned height)
 {
-	_fboTexture.reset(new Texture2D(width, height, nullptr));
-	_renderBuffer.reset(new RenderBuffer(width, height));
-	_frameBuffer.reset(new FrameBuffer());
-	_frameBuffer->bind();
-	_frameBuffer->attachColorBuffer(*_fboTexture);
-	_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
-	_frameBuffer->unbind();
+	//_fboTexture.reset(new Texture2D(width, height, nullptr));
+	//_multiSampledRenderBuffer.reset(new RenderBuffer(width, height, 4));
+	//_frameBuffer.reset(new FrameBuffer());
+	//_frameBuffer->bind();
+	//_frameBuffer->attachColorBuffer(*_fboTexture);
+	//_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
+	//_frameBuffer->unbind();
 }
 
 void PostProcess::begin()
@@ -95,14 +101,16 @@ void PostProcess::begin()
 	_frameBuffer->bind();
 }
 
-void PostProcess::render()
+void PostProcess::render(int mouseX)
 {
 	glDisable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	_shader.use();
+	_shader.setInt("MouseX", mouseX);
 
 	glBindVertexArray(_vao);
+		glActiveTexture(GL_TEXTURE0);
 		_fboTexture->bind();
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -110,5 +118,8 @@ void PostProcess::render()
 
 void PostProcess::end()
 {
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _frameBuffer->Id);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _intermediateFrameBuffer->Id);
+	glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	_frameBuffer->unbind();
 }

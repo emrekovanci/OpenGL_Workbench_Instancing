@@ -6,6 +6,7 @@ in vec2 TexCoords;
 
 out vec4 Color;
 
+uniform int MouseX;
 uniform sampler2D Scene;
 uniform vec2 Offsets[KERNEL_ELEMENT_COUNT];
 uniform float Kernel[KERNEL_ELEMENT_COUNT];
@@ -26,12 +27,19 @@ vec4 applyImageKernel(vec3 samples[KERNEL_ELEMENT_COUNT])
 
 void main()
 {
-	vec3 samples[KERNEL_ELEMENT_COUNT];
-
-	for (int i = 0; i < KERNEL_ELEMENT_COUNT; ++i)
+	if (gl_FragCoord.x < MouseX)
 	{
-		samples[i] = vec3(texture(Scene, TexCoords.st + Offsets[i]));
-	}
+		vec3 samples[KERNEL_ELEMENT_COUNT];
 
-	Color = applyImageKernel(samples);
+		for (int i = 0; i < KERNEL_ELEMENT_COUNT; ++i)
+		{
+			samples[i] = vec3(texture(Scene, TexCoords.st + Offsets[i]));
+		}
+
+		Color = applyImageKernel(samples);
+	}
+	else
+	{
+		Color = texture(Scene, TexCoords);
+	}
 }

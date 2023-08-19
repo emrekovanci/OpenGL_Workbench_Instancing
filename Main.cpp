@@ -52,11 +52,10 @@ int main()
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    //settings.antialiasingLevel = 4;
     settings.majorVersion = 3;
     settings.minorVersion = 3;
 
-    sf::Window window(sf::VideoMode(800, 600), "Chimpey!", sf::Style::Default, settings);
+    sf::Window window(sf::VideoMode(1920, 1080), "Chimpey!", sf::Style::Default, settings);
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction)))
     {
@@ -168,7 +167,6 @@ int main()
     float currentTime = 0.0f;
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
-    // glEnable(GL_MULTISAMPLE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     while (window.isOpen())
@@ -206,7 +204,7 @@ int main()
         postProcess.begin();
         render(vertices, vao);
         postProcess.end();
-        postProcess.render();
+        postProcess.render(sf::Mouse::getPosition().x);
 
         std::cout << '\r' << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
 
