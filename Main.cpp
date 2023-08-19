@@ -60,13 +60,6 @@ int main()
 
     Camera camera;
 
-    glm::mat4 projectionMatrix = glm::perspective(
-        glm::radians(45.0f),
-        static_cast<float>(window.getSize().x) / window.getSize().y,
-        0.1f,
-        100.0f
-    );
-
     // blinn-pong shader
     Shader litShader("resources/shaders/lit/vertex.glsl", "resources/shaders/lit/fragment.glsl");
 
@@ -172,12 +165,12 @@ int main()
         camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * cameraDistance;
     });
 
-    window.addRenderCallback([&litShader, &camera, &projectionMatrix]() {
+    window.addRenderCallback([&litShader, &camera, &window]() {
         litShader.use();
         litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
         litShader.setVec3("ViewPosition", camera.Position);
         litShader.setMat4("View", camera.getViewMatrix());
-        litShader.setMat4("Projection", projectionMatrix);
+        litShader.setMat4("Projection", camera.getProjectionMatrix(static_cast<float>(window.getSize().x) / window.getSize().y));
     });
 
     window.addRenderCallback([&postProcess, &vertices, &vao]() {
