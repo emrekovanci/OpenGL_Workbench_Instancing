@@ -14,7 +14,7 @@ private:
     void initShader();
 
 public:
-    PostProcess(const Shader& shader, unsigned int width, unsigned int height);
+    PostProcess(const Shader& shader, unsigned int width, unsigned int height, unsigned int samples = 4);
     void setSize(unsigned int width, unsigned height);
 
     void begin();
@@ -25,6 +25,7 @@ private:
     Shader _shader;
     unsigned int _width;
     unsigned int _height;
+    unsigned int _samples;
 
     std::unique_ptr<Texture2D> _multiSampledColorBuffer;
     std::unique_ptr<RenderBuffer> _multiSampledRenderBuffer;

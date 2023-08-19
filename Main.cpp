@@ -14,7 +14,6 @@
 
 #include <Graphics/PostProcess.hpp>
 
-constexpr unsigned int AntiAliasingLevel = 4;
 constexpr float CameraDistance = 3.0f;
 
 std::vector<glm::mat4> ModelMatrices;

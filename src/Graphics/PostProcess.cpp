@@ -62,12 +62,13 @@ void PostProcess::initShader()
 	glUniform1fv(glGetUniformLocation(_shader.getProgramId(), "Kernel"), 9, kernel);
 }
 
-PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height) :
+PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height, unsigned int samples) :
     _shader { shader },
     _width { width },
     _height { height },
-	_multiSampledColorBuffer { std::make_unique<Texture2D>(width, height, nullptr, 8) },
-	_multiSampledRenderBuffer { std::make_unique<RenderBuffer>(width, height, 8) },
+	_samples { samples },
+	_multiSampledColorBuffer { std::make_unique<Texture2D>(width, height, nullptr, samples) },
+	_multiSampledRenderBuffer { std::make_unique<RenderBuffer>(width, height, samples) },
 	_intermediateFrameBuffer{ std::make_unique<FrameBuffer>() },
 	_fboTexture { std::make_unique<Texture2D>(width, height, nullptr) },
 	_frameBuffer { std::make_unique<FrameBuffer>() }
