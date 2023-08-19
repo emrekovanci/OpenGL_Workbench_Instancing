@@ -2,6 +2,7 @@
 
 ### Features
 
+- Lit Shader (Blinn-Pong)
 - GPU Instancing
 - Post Processing
-- Lit Shader (Blinn-Pong)
+- Anti Aliasing
