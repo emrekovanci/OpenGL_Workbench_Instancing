@@ -19,7 +19,9 @@ public:
     Window(unsigned int width, unsigned int height, const sf::String& title);
     void display();
 
+    sf::Vector2i getMousePosition() const;
     sf::Vector2u getSize() const;
+    float getAspectRatio() const;
 
     void addInitCallback(const InitCallback& callback);
     void addUpdateCallback(const UpdateCallback& callback);

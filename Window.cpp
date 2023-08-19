@@ -32,9 +32,19 @@ void Window::display()
     }
 }
 
+sf::Vector2i Window::getMousePosition() const
+{
+    return sf::Mouse::getPosition(_window);
+}
+
 sf::Vector2u Window::getSize() const
 {
     return _window.getSize();
+}
+
+float Window::getAspectRatio() const
+{
+    return static_cast<float>(getSize().x) / getSize().y;
 }
 
 void Window::addInitCallback(const InitCallback& callback)

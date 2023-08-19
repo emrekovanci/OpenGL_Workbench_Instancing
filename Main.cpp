@@ -48,7 +48,7 @@ void render(const std::vector<Vertex>& vertices, GLuint vao)
 
 int main()
 {
-    Window window(1920, 1080, "Chimper!");
+    Window window(1027, 768, "Chimpey!");
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction)))
     {
@@ -170,14 +170,14 @@ int main()
         litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
         litShader.setVec3("ViewPosition", camera.Position);
         litShader.setMat4("View", camera.getViewMatrix());
-        litShader.setMat4("Projection", camera.getProjectionMatrix(static_cast<float>(window.getSize().x) / window.getSize().y));
+        litShader.setMat4("Projection", camera.getProjectionMatrix(window.getAspectRatio()));
     });
 
-    window.addRenderCallback([&postProcess, &vertices, &vao]() {
+    window.addRenderCallback([&postProcess, &vertices, &vao, &window]() {
         postProcess.begin();
         render(vertices, vao);
         postProcess.end();
-        postProcess.render(sf::Mouse::getPosition().x);
+        postProcess.render(window.getMousePosition().x);
     });
 
     window.display();
