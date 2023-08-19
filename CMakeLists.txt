@@ -6,7 +6,7 @@ add_subdirectory(src/Core)
 add_subdirectory(src/Math)
 add_subdirectory(src/Graphics)
 
-add_executable(${PROJECT_NAME} Main.cpp)
+add_executable(${PROJECT_NAME} Main.cpp Window.hpp Window.cpp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 

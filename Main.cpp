@@ -14,7 +14,7 @@
 
 #include <Graphics/PostProcess.hpp>
 
-constexpr float CameraDistance = 3.0f;
+#include "Window.hpp"
 
 std::vector<glm::mat4> ModelMatrices;
 Graph graph(&ModelMatrices);
@@ -48,13 +48,7 @@ void render(const std::vector<Vertex>& vertices, GLuint vao)
 
 int main()
 {
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.majorVersion = 3;
-    settings.minorVersion = 3;
-
-    sf::Window window(sf::VideoMode(1920, 1080), "Chimpey!", sf::Style::Default, settings);
+    Window window(1920, 1080, "Chimper!");
 
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction)))
     {
@@ -156,59 +150,44 @@ int main()
         const int offset = i + modelMatrixLocation;
 
         glEnableVertexAttribArray(offset);
-        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i *  sizeof(glm::vec4)));
+        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
         glVertexAttribDivisor(offset, 1);
     }
     glBindVertexArray(0);
 
-    sf::Clock clock;
-    float previousTime = clock.getElapsedTime().asSeconds();
-    float currentTime = 0.0f;
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    window.addInitCallback([]() {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    });
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed) { window.close(); }
-            if (event.type == sf::Event::Resized)
-            {
-                glViewport(0, 0, event.size.width, event.size.height);
-                postProcess.setSize(event.size.width, event.size.height);
-            }
-        }
-
-        // timing
-        currentTime = clock.getElapsedTime().asSeconds();
-        const float deltaTime = currentTime - previousTime;
-        previousTime = currentTime;
-
-        // simulate
+    window.addUpdateCallback([&fpsCounter, &modelBuffer](float deltaTime) {
         fpsCounter.update(deltaTime);
         graph.update(deltaTime);
         updateModelBuffer(modelBuffer);
+    });
 
-        // camera
-        camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * CameraDistance;
+    window.addLifeTimeCallback([&camera](float currentTime) {
+        constexpr float cameraDistance = 3.0f;
+        camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * cameraDistance;
+    });
 
+    window.addRenderCallback([&litShader, &camera, &projectionMatrix]() {
         litShader.use();
         litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
         litShader.setVec3("ViewPosition", camera.Position);
         litShader.setMat4("View", camera.getViewMatrix());
         litShader.setMat4("Projection", projectionMatrix);
+    });
 
+    window.addRenderCallback([&postProcess, &vertices, &vao]() {
         postProcess.begin();
         render(vertices, vao);
         postProcess.end();
         postProcess.render(sf::Mouse::getPosition().x);
+    });
 
-        std::cout << '\r' << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
-
-        window.display();
-    }
+    window.display();
 
     return EXIT_SUCCESS;
 }
