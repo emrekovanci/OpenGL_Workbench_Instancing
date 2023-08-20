@@ -49,7 +49,6 @@ void render(const std::vector<Vertex>& vertices, GLuint vao)
 int main()
 {
     Window window(1027, 768, "Chimpey!");
-
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction)))
     {
         std::cout << "Failed to initialize GLAD!\n";
@@ -59,11 +58,7 @@ int main()
     displayGpuInfo();
 
     Camera camera;
-
-    // blinn-pong shader
     Shader litShader("resources/shaders/lit/vertex.glsl", "resources/shaders/lit/fragment.glsl");
-
-    // post-process shader
     Shader postProcessShader("resources/shaders/postprocess/vertex.glsl", "resources/shaders/postprocess/fragment.glsl");
     PostProcess postProcess(postProcessShader, window.getSize().x, window.getSize().y);
 
