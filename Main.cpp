@@ -133,7 +133,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
     glBindVertexArray(vao);
-    GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
+    const GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
     {
         const int offset = i + modelMatrixLocation;
