@@ -190,11 +190,9 @@ int main()
 
     // show fps in window title
     window.addRenderCallback([&fpsCounter, &window]() {
-
         std::ostringstream windowTitle;
         windowTitle << "Chimpey! ";
         windowTitle << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
-
         window.setTitle(windowTitle.str());
     });
 
