@@ -63,24 +63,12 @@ void PostProcess::initShader()
 }
 
 PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int height, unsigned int samples) :
-    _shader { shader },
-    _width { width },
-    _height { height },
-	_samples { samples },
-	_multiSampledColorBuffer { std::make_unique<Texture2D>(width, height, nullptr, samples) },
-	_multiSampledRenderBuffer { std::make_unique<RenderBuffer>(width, height, samples) },
-	_intermediateFrameBuffer{ std::make_unique<FrameBuffer>() },
-	_fboTexture { std::make_unique<Texture2D>(width, height, nullptr) },
-	_frameBuffer { std::make_unique<FrameBuffer>() }
+	_shader{ shader },
+	_width{ width },
+	_height{ height },
+	_samples{ samples }
 {
-	_frameBuffer->bind();
-	_frameBuffer->attachColorBuffer(*_multiSampledColorBuffer);
-	_frameBuffer->attachDepthStencilBuffer(*_multiSampledRenderBuffer);
-	_frameBuffer->unbind();
-
-	_intermediateFrameBuffer->bind();
-	_intermediateFrameBuffer->attachColorBuffer(*_fboTexture);
-	_intermediateFrameBuffer->unbind();
+	setSize(width, height);
 
 	initVao();
 	initShader();
