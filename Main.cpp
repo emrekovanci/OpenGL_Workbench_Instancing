@@ -122,17 +122,17 @@ int main()
     glGenBuffers(1, &positionBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-    glBindVertexArray(0);
 
     GLuint modelBuffer;
     glGenBuffers(1, &modelBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
-    glBindVertexArray(vao);
+
     const GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
     {
