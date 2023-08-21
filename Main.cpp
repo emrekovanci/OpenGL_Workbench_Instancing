@@ -3,7 +3,6 @@
 #include <vector>
 
 #include <glad/glad.h>
-#include <SFML/Window.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
 #include <Core/Vertex.hpp>
