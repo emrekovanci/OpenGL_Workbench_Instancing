@@ -150,6 +150,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     });
 
+    // handle inputs
     window.addEventCallback([&window, &postProcess](const sf::Event& event) {
         if (event.type == sf::Event::Closed) { window.close(); }
         if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) { window.close(); }
@@ -161,17 +162,20 @@ int main()
         }
     });
 
+    // simulate
     window.addUpdateCallback([&fpsCounter, &modelBuffer](float deltaTime) {
         fpsCounter.update(deltaTime);
         graph.update(deltaTime);
         updateModelBuffer(modelBuffer);
     });
 
+    // rotate camera
     window.addLifeTimeCallback([&camera](float currentTime) {
         constexpr float cameraDistance = 3.0f;
         camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * cameraDistance;
     });
 
+    // set shader uniforms
     window.addRenderCallback([&litShader, &camera, &window]() {
         litShader.use();
         litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
@@ -180,6 +184,7 @@ int main()
         litShader.setMat4("Projection", camera.getProjectionMatrix(window.getAspectRatio()));
     });
 
+    // render
     window.addRenderCallback([&postProcess, &vertices, &vao, &window]() {
         postProcess.begin();
         render(vertices, vao);
@@ -187,6 +192,7 @@ int main()
         postProcess.render(window.getMousePosition().x);
     });
 
+    // show fps in window title
     window.addRenderCallback([&fpsCounter, &window]() {
 
         std::ostringstream windowTitle;
