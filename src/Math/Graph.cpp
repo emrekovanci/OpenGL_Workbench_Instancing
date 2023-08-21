@@ -59,9 +59,9 @@ void Graph::updateTransforms(EffectFunction effect)
 
 void Graph::updateTransformAt(int index, const glm::vec3& position)
 {
-    glm::mat4 modelMatrix = glm::translate(_identityMatrix, position);
-    modelMatrix = glm::scale(modelMatrix, _resolutionScale);
-    (*_transforms)[index] = modelMatrix;
+    Transform transform = glm::translate(_identityMatrix, position);
+    transform = glm::scale(transform, _resolutionScale);
+    (*_transforms)[index] = transform;
 }
 
 float Graph::normalizeCoord(int axisValue) const
