@@ -4,28 +4,29 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+using Transform = glm::mat4;
+using Transforms = std::vector<Transform>;
+
 class Graph
 {
-    using ModelMatrices = std::vector<glm::mat4>;
-
 private:
     void startTransition();
     void updateTransition();
     void updateEffect();
 
-    void updateModelMatrix(EffectFunction from, EffectFunction to, float progress);
-    void updateModelMatrix(EffectFunction effect);
-    void updateMatrixAt(int index, const glm::vec3& position);
+    void updateTransforms(EffectFunction from, EffectFunction to, float progress);
+    void updateTransforms(EffectFunction effect);
+    void updateTransformAt(int index, const glm::vec3& position);
 
     float normalizeCoord(int axisValue) const;
 
 public:
-    explicit Graph(ModelMatrices* modelMatrices);
+    explicit Graph(Transforms* transforms);
     void update(float deltaTime);
     int getGraphResolution() const;
 
 private:
-    ModelMatrices* _modelMatrices;
+    Transforms* _transforms;
 
     const int _cubesPerAxes { 50 };
     const int _cubesPerGraph { _cubesPerAxes * _cubesPerAxes };

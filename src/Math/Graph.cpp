@@ -13,17 +13,17 @@ void Graph::updateTransition()
     EffectFunction to = MathEffectSelector::getFunction(_currentFunction);
     const float progress = _duration / _transitionDuration;
 
-    updateModelMatrix(from, to, progress);
+    updateTransforms(from, to, progress);
 }
 
 void Graph::updateEffect()
 {
     EffectFunction effect = MathEffectSelector::getFunction(_currentFunction);
 
-    updateModelMatrix(effect);
+    updateTransforms(effect);
 }
 
-void Graph::updateModelMatrix(EffectFunction from, EffectFunction to, float progress)
+void Graph::updateTransforms(EffectFunction from, EffectFunction to, float progress)
 {
     for (int i = 0, x = 0, z = 0; i < _cubesPerGraph; ++i, ++x)
     {
@@ -36,11 +36,11 @@ void Graph::updateModelMatrix(EffectFunction from, EffectFunction to, float prog
         const float xPos = normalizeCoord(x);
         const float zPos = normalizeCoord(z);
         const glm::vec3 position = MathEffect::Morph(xPos, zPos, _elapsedTime, from, to, progress);
-        updateMatrixAt(i, position);
+        updateTransformAt(i, position);
     }
 }
 
-void Graph::updateModelMatrix(EffectFunction effect)
+void Graph::updateTransforms(EffectFunction effect)
 {
     for (int i = 0, x = 0, z = 0; i < _cubesPerGraph; ++i, ++x)
     {
@@ -53,15 +53,15 @@ void Graph::updateModelMatrix(EffectFunction effect)
         const float xPos = normalizeCoord(x);
         const float zPos = normalizeCoord(z);
         const glm::vec3 position = effect(xPos, zPos, _elapsedTime);
-        updateMatrixAt(i, position);
+        updateTransformAt(i, position);
     }
 }
 
-void Graph::updateMatrixAt(int index, const glm::vec3& position)
+void Graph::updateTransformAt(int index, const glm::vec3& position)
 {
     glm::mat4 modelMatrix = glm::translate(_identityMatrix, position);
     modelMatrix = glm::scale(modelMatrix, _resolutionScale);
-    (*_modelMatrices)[index] = modelMatrix;
+    (*_transforms)[index] = modelMatrix;
 }
 
 float Graph::normalizeCoord(int axisValue) const
@@ -69,13 +69,13 @@ float Graph::normalizeCoord(int axisValue) const
     return (axisValue + 0.5f) * _step - 1.0f;
 }
 
-Graph::Graph(ModelMatrices* modelMatrices) : _modelMatrices { modelMatrices }
+Graph::Graph(Transforms* transforms) : _transforms { transforms }
 {
-    _modelMatrices->reserve(_cubesPerGraph);
+    _transforms->reserve(_cubesPerGraph);
 
     for (int i = 0; i < _cubesPerGraph; ++i)
     {
-        _modelMatrices->push_back(glm::mat4(1.0f));
+        _transforms->push_back(glm::mat4(1.0f));
     }
 }
 

@@ -16,8 +16,8 @@
 
 #include "Window.hpp"
 
-std::vector<glm::mat4> ModelMatrices;
-Graph graph(&ModelMatrices);
+Transforms transforms;
+Graph graph(&transforms);
 
 void displayGpuInfo()
 {
@@ -32,7 +32,7 @@ void displayGpuInfo()
 void updateModelBuffer(GLuint modelBuffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Transform) * transforms.size(), transforms.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -130,7 +130,7 @@ int main()
     GLuint modelBuffer;
     glGenBuffers(1, &modelBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Transform) * transforms.size(), transforms.data(), GL_DYNAMIC_DRAW);
 
     const GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
@@ -138,7 +138,7 @@ int main()
         const int offset = i + modelMatrixLocation;
 
         glEnableVertexAttribArray(offset);
-        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * sizeof(glm::vec4)));
+        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(Transform), (void*)(i * sizeof(glm::vec4)));
         glVertexAttribDivisor(offset, 1);
     }
     glBindVertexArray(0);
