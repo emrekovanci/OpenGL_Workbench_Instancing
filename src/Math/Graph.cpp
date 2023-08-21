@@ -35,7 +35,7 @@ void Graph::updateModelMatrix(EffectFunction from, EffectFunction to, float prog
 
         const float xPos = normalizeCoord(x);
         const float zPos = normalizeCoord(z);
-        glm::vec3 position = MathEffect::Morph(xPos, zPos, _elapsedTime, from, to, progress);
+        const glm::vec3 position = MathEffect::Morph(xPos, zPos, _elapsedTime, from, to, progress);
         updateMatrixAt(i, position);
     }
 }
@@ -52,7 +52,7 @@ void Graph::updateModelMatrix(EffectFunction effect)
 
         const float xPos = normalizeCoord(x);
         const float zPos = normalizeCoord(z);
-        glm::vec3 position = effect(xPos, zPos, _elapsedTime);
+        const glm::vec3 position = effect(xPos, zPos, _elapsedTime);
         updateMatrixAt(i, position);
     }
 }
