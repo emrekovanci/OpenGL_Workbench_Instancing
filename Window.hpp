@@ -48,7 +48,4 @@ private:
     sf::Clock _clock;
     float _previousTime { 0.0f };
     float _currentTime { 0.0f };
-
-    // depth, stencil, antialiasing, majorVer, minorVer
-    const sf::ContextSettings _context { 24, 8, 0, 3, 3 };
 };

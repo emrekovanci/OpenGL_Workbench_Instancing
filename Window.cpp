@@ -2,9 +2,12 @@
 
 #include <glad/glad.h>
 
-Window::Window(unsigned int width, unsigned int height, const sf::String& title)
+#include <iostream>
+
+Window::Window(unsigned int width, unsigned int height, const sf::String& title) :
+    _window { sf::VideoMode(width, height), title, sf::Style::Default, sf::ContextSettings(24, 8, 0, 3, 3) },
+    _event { }
 {
-    _window.create(sf::VideoMode(width, height), title, sf::Style::Default, _context);
     _previousTime = _clock.getElapsedTime().asSeconds();
 
     for (const auto& initCallback : _initCallbacks)
