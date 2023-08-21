@@ -20,7 +20,7 @@ glm::vec3 MathEffect::MultiWave(float x, float z, float time)
 
 glm::vec3 MathEffect::Ripple(float x, float z, float time)
 {
-    float distance = glm::sqrt(x * x + z * z);
+    const float distance = glm::sqrt(x * x + z * z);
 
     glm::vec3 vec(x, glm::sin(PI * (4.0f * distance - time)), z);
     vec.y /= 1.0f + 10.0f * distance;
