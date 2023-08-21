@@ -149,6 +149,17 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     });
 
+    window.addEventCallback([&window, &postProcess](sf::Event event) {
+        if (event.type == sf::Event::Closed) { window.close(); }
+        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) { window.close(); }
+
+        if (event.type == sf::Event::Resized)
+        {
+            glViewport(0, 0, event.size.width, event.size.height);
+            postProcess.setSize(event.size.width, event.size.height);
+        }
+    });
+
     window.addUpdateCallback([&fpsCounter, &modelBuffer](float deltaTime) {
         fpsCounter.update(deltaTime);
         graph.update(deltaTime);

@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+#include <glad/glad.h>
+
 Window::Window(unsigned int width, unsigned int height, const sf::String& title)
 {
     _window.create(sf::VideoMode(width, height), title, sf::Style::Default, _context);
@@ -17,7 +19,10 @@ void Window::display()
     {
         while (_window.pollEvent(_event))
         {
-            if (_event.type == sf::Event::Closed) { _window.close(); }
+            for (const auto& eventCallback : _eventCallbacks)
+            {
+                eventCallback(_event);
+            }
         }
 
         _currentTime = _clock.getElapsedTime().asSeconds();
@@ -30,6 +35,11 @@ void Window::display()
 
         _window.display();
     }
+}
+
+void Window::close()
+{
+    _window.close();
 }
 
 sf::Vector2i Window::getMousePosition() const
@@ -65,4 +75,9 @@ void Window::addLifeTimeCallback(const LifeTimeCallback& callback)
 void Window::addRenderCallback(const RenderCallback& callback)
 {
     _renderCallbacks.push_back(callback);
+}
+
+void Window::addEventCallback(const EventCallback& callback)
+{
+    _eventCallbacks.push_back(callback);
 }

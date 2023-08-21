@@ -88,13 +88,23 @@ PostProcess::PostProcess(const Shader& shader, unsigned int width, unsigned int 
 
 void PostProcess::setSize(unsigned int width, unsigned height)
 {
-	//_fboTexture.reset(new Texture2D(width, height, nullptr));
-	//_multiSampledRenderBuffer.reset(new RenderBuffer(width, height, 4));
-	//_frameBuffer.reset(new FrameBuffer());
-	//_frameBuffer->bind();
-	//_frameBuffer->attachColorBuffer(*_fboTexture);
-	//_frameBuffer->attachDepthStencilBuffer(*_renderBuffer);
-	//_frameBuffer->unbind();
+	_width = width;
+	_height = height;
+
+	_multiSampledColorBuffer.reset(new Texture2D(width, height, nullptr, _samples));
+	_multiSampledRenderBuffer.reset(new RenderBuffer(width, height, _samples));
+	_intermediateFrameBuffer.reset(new FrameBuffer());
+	_fboTexture.reset(new Texture2D(width, height, nullptr));
+	_frameBuffer.reset(new FrameBuffer());
+
+	_frameBuffer->bind();
+	_frameBuffer->attachColorBuffer(*_multiSampledColorBuffer);
+	_frameBuffer->attachDepthStencilBuffer(*_multiSampledRenderBuffer);
+	_frameBuffer->unbind();
+
+	_intermediateFrameBuffer->bind();
+	_intermediateFrameBuffer->attachColorBuffer(*_fboTexture);
+	_intermediateFrameBuffer->unbind();
 }
 
 void PostProcess::begin()
