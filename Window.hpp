@@ -9,7 +9,7 @@ using InitCallback = std::function<void()>;
 using UpdateCallback = std::function<void(float)>;
 using LifeTimeCallback = std::function<void(float)>;
 using RenderCallback = std::function<void()>;
-using EventCallback = std::function<void(sf::Event)>;
+using EventCallback = std::function<void(const sf::Event&)>;
 
 class Window
 {
@@ -18,6 +18,7 @@ public:
 
     void display();
     void close();
+    void setTitle(const std::string& title);
 
     sf::Vector2i getMousePosition() const;
     sf::Vector2u getSize() const;

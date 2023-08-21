@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include <glad/glad.h>
@@ -149,7 +150,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     });
 
-    window.addEventCallback([&window, &postProcess](sf::Event event) {
+    window.addEventCallback([&window, &postProcess](const sf::Event& event) {
         if (event.type == sf::Event::Closed) { window.close(); }
         if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) { window.close(); }
 
@@ -184,6 +185,15 @@ int main()
         render(vertices, vao);
         postProcess.end();
         postProcess.render(window.getMousePosition().x);
+    });
+
+    window.addRenderCallback([&fpsCounter, &window]() {
+
+        std::ostringstream windowTitle;
+        windowTitle << "Chimpey! ";
+        windowTitle << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
+
+        window.setTitle(windowTitle.str());
     });
 
     window.display();

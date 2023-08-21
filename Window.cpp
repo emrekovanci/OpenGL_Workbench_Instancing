@@ -45,6 +45,11 @@ void Window::close()
     _window.close();
 }
 
+void Window::setTitle(const std::string& title)
+{
+    _window.setTitle(title);
+}
+
 sf::Vector2i Window::getMousePosition() const
 {
     return sf::Mouse::getPosition(_window);
