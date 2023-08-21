@@ -37,7 +37,7 @@ void PostProcess::initShader()
 	_shader.setInt("Scene", 0);
 
 	// init offsets
-	const float offset = 1.0f / 300.0f;
+	constexpr float offset = 1.0f / 300.0f;
 	const float offsets[9][2] =
 	{
 		{ -offset,  offset  },  // top-left
