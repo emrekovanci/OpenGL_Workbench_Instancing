@@ -1,8 +1,8 @@
 #include <Core/FrameRateCounter.hpp>
 
 FrameRateCounter::FrameRateCounter(Display displayMode, float sampleDuration) :
-    _sampleDuration { sampleDuration },
-    _displayMode { displayMode }
+    _displayMode { displayMode },
+    _sampleDuration { sampleDuration }
 {
 
 }
