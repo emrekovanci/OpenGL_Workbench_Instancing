@@ -11,7 +11,7 @@ void Graph::updateTransition()
 {
     EffectFunction from = MathEffectSelector::getFunction(_transitionFunction);
     EffectFunction to = MathEffectSelector::getFunction(_currentFunction);
-    float progress = _duration / _transitionDuration;
+    const float progress = _duration / _transitionDuration;
 
     updateModelMatrix(from, to, progress);
 }
