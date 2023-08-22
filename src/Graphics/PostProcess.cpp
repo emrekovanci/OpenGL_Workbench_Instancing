@@ -1,5 +1,7 @@
 #include <Graphics/PostProcess.hpp>
 
+#include <Core/Buffers/VertexBuffer.hpp>
+
 #include <iostream>
 #include <vector>
 
@@ -20,14 +22,14 @@ void PostProcess::initVao()
 	glGenVertexArrays(1, &_vao);
 	glBindVertexArray(_vao);
 
-	glGenBuffers(1, &_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+	VertexBuffer vertexBuffer(VertexBuffer::Usage::Static);
+	vertexBuffer.bind();
+	vertexBuffer.fill(vertices);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	vertexBuffer.unbind();
 	glBindVertexArray(0);
 }
 
