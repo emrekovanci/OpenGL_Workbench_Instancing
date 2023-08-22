@@ -2,6 +2,7 @@
 
 #include <Core/Shader.hpp>
 #include <Core/Texture2D.hpp>
+#include <Core/VertexArray.hpp>
 #include <Core/Buffers/FrameBuffer.hpp>
 #include <Core/Buffers/RenderBuffer.hpp>
 
@@ -34,6 +35,5 @@ private:
     std::unique_ptr<Texture2D> _fboTexture;
     std::unique_ptr<FrameBuffer> _frameBuffer;
 
-    unsigned int _vbo;
-    unsigned int _vao;
+    VertexArray _vao;
 };

@@ -1,9 +1,9 @@
 #include <Graphics/PostProcess.hpp>
 
-#include <Core/Buffers/VertexBuffer.hpp>
-
 #include <iostream>
 #include <vector>
+
+#include <Core/Buffers/VertexBuffer.hpp>
 
 void PostProcess::initVao()
 {
@@ -19,18 +19,16 @@ void PostProcess::initVao()
 		1.0f,  1.0f,	1.0f, 1.0f
 	};
 
-	glGenVertexArrays(1, &_vao);
-	glBindVertexArray(_vao);
+	_vao.bind();
 
 	VertexBuffer vertexBuffer(VertexBuffer::Usage::Static);
 	vertexBuffer.bind();
 	vertexBuffer.fill(vertices);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)0);
+	_vao.enableAttribute(0, 4, 4 * sizeof(GLfloat), (void*)0);
 
 	vertexBuffer.unbind();
-	glBindVertexArray(0);
+	_vao.unbind();
 }
 
 void PostProcess::initShader()
@@ -110,11 +108,11 @@ void PostProcess::render(int mouseX)
 	_shader.use();
 	_shader.setInt("MouseX", mouseX);
 
-	glBindVertexArray(_vao);
+	_vao.bind();
 		glActiveTexture(GL_TEXTURE0);
 		_fboTexture->bind();
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
+	_vao.unbind();
 }
 
 void PostProcess::end()

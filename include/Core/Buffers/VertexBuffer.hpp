@@ -13,7 +13,7 @@ struct VertexBuffer
 		Stream
 	};
 
-	explicit VertexBuffer(Usage usage);
+	explicit VertexBuffer(Usage usage = Usage::Static);
 	~VertexBuffer();
 
 	template <typename T>

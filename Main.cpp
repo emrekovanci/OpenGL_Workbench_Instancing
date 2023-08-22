@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+#include <Core/VertexArray.hpp>
 #include <Core/Buffers/VertexBuffer.hpp>
 #include <Core/Vertex.hpp>
 #include <Core/Shader.hpp>
@@ -36,14 +37,14 @@ void updateModelBuffer(const VertexBuffer& modelBuffer)
     modelBuffer.unbind();
 }
 
-void render(const std::vector<Vertex>& vertices, GLuint vao)
+void render(const std::vector<Vertex>& vertices, const VertexArray& vao)
 {
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindVertexArray(vao);
+    vao.bind();
     glDrawArraysInstanced(GL_TRIANGLES, 0, vertices.size(), graph.getGraphResolution());
-    glBindVertexArray(0);
+    vao.unbind();
 }
 
 int main()
@@ -113,18 +114,15 @@ int main()
         { { -0.5f,  0.5f, -0.5f }, { 0.0f,  1.0f,  0.0f } }
     };
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    VertexArray vao;
+    vao.bind();
 
     VertexBuffer positionBuffer(VertexBuffer::Usage::Static);
     positionBuffer.bind();
     positionBuffer.fill(vertices);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+    vao.enableAttribute(0, 3, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+    vao.enableAttribute(1, 3, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
     VertexBuffer modelBuffer(VertexBuffer::Usage::Dynamic);
     modelBuffer.bind();
@@ -135,11 +133,11 @@ int main()
     {
         const int offset = i + modelMatrixLocation;
 
-        glEnableVertexAttribArray(offset);
-        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(Transform), (void*)(i * sizeof(glm::vec4)));
-        glVertexAttribDivisor(offset, 1);
+        vao.enableAttribute(offset, 4, sizeof(Transform), (void*)(i * sizeof(glm::vec4)));
+        vao.divisor(offset, 1);
     }
-    glBindVertexArray(0);
+
+    vao.unbind();
 
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
