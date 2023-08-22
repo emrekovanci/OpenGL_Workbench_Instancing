@@ -36,7 +36,7 @@ namespace
 				return GL_STATIC_DRAW;
 			case VertexBuffer::Usage::Dynamic:
 				return GL_DYNAMIC_DRAW;
-			case VertexBuffer::Usage::Stream:
+			default:
 				return GL_STREAM_DRAW;
 		}
 	}
