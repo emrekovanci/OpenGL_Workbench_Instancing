@@ -4,8 +4,9 @@ project(OpenGL_Workbench_Instancing)
 
 add_subdirectory(src/Core)
 add_subdirectory(src/Math)
+add_subdirectory(src/Graphics)
 
-add_executable(${PROJECT_NAME} Main.cpp)
+add_executable(${PROJECT_NAME} Main.cpp Window.hpp Window.cpp)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
@@ -18,7 +19,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE sfml-system sfml-network sfml-grap
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE CoreLibrary MathEffectLibrary)
+target_link_libraries(${PROJECT_NAME} PRIVATE CoreLibrary MathEffectLibrary GraphicsLibrary)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})
 

@@ -1,10 +1,11 @@
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include <glad/glad.h>
-#include <SFML/Window.hpp>
-#include <glm/ext/matrix_transform.hpp>
 
+#include <Core/VertexArray.hpp>
+#include <Core/Buffers/VertexBuffer.hpp>
 #include <Core/Vertex.hpp>
 #include <Core/Shader.hpp>
 #include <Core/Camera.hpp>
@@ -12,63 +13,57 @@
 
 #include <Math/Graph.hpp>
 
-constexpr float CameraDistance = 3.0f;
+#include <Graphics/PostProcess.hpp>
 
-std::vector<glm::mat4> ModelMatrices;
-Graph graph(&ModelMatrices);
+#include "Window.hpp"
 
-void updateModelBuffer(GLuint modelBuffer)
+Transforms transforms;
+Graph graph(&transforms);
+
+void displayGpuInfo()
 {
-    glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    std::cout
+        << "---------------------------------------------\n"
+        << "Vendor:  \t" << glGetString(GL_VENDOR)   << '\n'
+        << "Version: \t" << glGetString(GL_VERSION)  << '\n'
+        << "Renderer:\t" << glGetString(GL_RENDERER) << '\n'
+        << "---------------------------------------------\n";
 }
 
-void render(GLuint vao)
+void updateModelBuffer(const VertexBuffer& modelBuffer)
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    modelBuffer.bind();
+    modelBuffer.fill(transforms);
+    modelBuffer.unbind();
+}
+
+void render(const std::vector<Vertex>& vertices, const VertexArray& vao)
+{
+    glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBindVertexArray(vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, graph.getGraphResolution());
-    glBindVertexArray(0);
+    vao.bind();
+    glDrawArraysInstanced(GL_TRIANGLES, 0, vertices.size(), graph.getGraphResolution());
+    vao.unbind();
 }
 
 int main()
 {
-    sf::ContextSettings settings;
-    settings.depthBits = 24;
-    settings.stencilBits = 8;
-    settings.antialiasingLevel = 4;
-    settings.majorVersion = 3;
-    settings.minorVersion = 3;
-
-    sf::Window window(sf::VideoMode(800, 600), "Chimpey!", sf::Style::Default, settings);
-
+    Window window(1027, 768, "Chimpey!");
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction)))
     {
         std::cout << "Failed to initialize GLAD!\n";
         return EXIT_FAILURE;
     }
 
-    std::cout << "Vendor:" << glGetString(GL_VENDOR) << '\n';
-    std::cout << "Version:" << glGetString(GL_VERSION) << '\n';
-    std::cout << "Renderer:" << glGetString(GL_RENDERER) << '\n';
-    std::cout << "-----------\n";
+    displayGpuInfo();
 
     Camera camera;
+    Shader litShader("resources/shaders/lit/vertex.glsl", "resources/shaders/lit/fragment.glsl");
+    Shader postProcessShader("resources/shaders/postprocess/vertex.glsl", "resources/shaders/postprocess/fragment.glsl");
+    PostProcess postProcess(postProcessShader, window.getSize().x, window.getSize().y);
 
-    glm::mat4 projectionMatrix = glm::perspective(
-        glm::radians(45.0f),
-        static_cast<float>(window.getSize().x) / window.getSize().y,
-        0.1f,
-        100.0f
-    );
-
-    Shader shader("resources/shaders/vertex.glsl", "resources/shaders/fragment.glsl");
-    shader.use();
-
-    std::vector<Vertex> vertexPositions
+    std::vector<Vertex> vertices
     {
         // back face
         { { -0.5f, -0.5f, -0.5f }, { 0.0f,  0.0f, -1.0f } },
@@ -119,76 +114,86 @@ int main()
         { { -0.5f,  0.5f, -0.5f }, { 0.0f,  1.0f,  0.0f } }
     };
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    VertexArray vao;
+    vao.bind();
 
-    GLuint positionBuffer;
-    glGenBuffers(1, &positionBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(Vertex), vertexPositions.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-    glBindVertexArray(0);
+    VertexBuffer positionBuffer(VertexBuffer::Usage::Static);
+    positionBuffer.bind();
+    positionBuffer.fill(vertices);
 
-    GLuint modelBuffer;
-    glGenBuffers(1, &modelBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * ModelMatrices.size(), ModelMatrices.data(), GL_DYNAMIC_DRAW);
-    glBindVertexArray(vao);
-    GLuint modelMatrixLocation = shader.getAttribLocation("instanceMatrix");
+    vao.enableAttribute(0, 3, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+    vao.enableAttribute(1, 3, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+    VertexBuffer modelBuffer(VertexBuffer::Usage::Dynamic);
+    modelBuffer.bind();
+    modelBuffer.fill(transforms);
+
+    const GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
     {
         const int offset = i + modelMatrixLocation;
 
-        glEnableVertexAttribArray(offset);
-        glVertexAttribPointer(offset, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i *  sizeof(glm::vec4)));
-        glVertexAttribDivisor(offset, 1);
+        vao.enableAttribute(offset, 4, sizeof(Transform), (void*)(i * sizeof(glm::vec4)));
+        vao.divisor(offset, 1);
     }
-    glBindVertexArray(0);
 
-    sf::Clock clock;
-    float previousTime = clock.getElapsedTime().asSeconds();
-    float currentTime = 0.0f;
+    vao.unbind();
+
     FrameRateCounter fpsCounter(FrameRateCounter::Display::FPS);
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_MULTISAMPLE);
+    window.addInitCallback([]() {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    });
 
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
+    // handle inputs
+    window.addEventCallback([&window, &postProcess](const sf::Event& event) {
+        if (event.type == sf::Event::Closed) { window.close(); }
+        if (event.type == sf::Event::Resized)
         {
-            if (event.type == sf::Event::Closed) { window.close(); }
-            if (event.type == sf::Event::Resized) { glViewport(0, 0, event.size.width, event.size.height); }
+            glViewport(0, 0, event.size.width, event.size.height);
+            postProcess.setSize(event.size.width, event.size.height);
         }
+    });
 
-        // timing
-        currentTime = clock.getElapsedTime().asSeconds();
-        const float deltaTime = currentTime - previousTime;
-        previousTime = currentTime;
+    // simulate
+    window.addUpdateCallback([&fpsCounter, &modelBuffer](float deltaTime) {
         fpsCounter.update(deltaTime);
-
-        // camera
-        camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * CameraDistance;
-
-        // shader properties
-        shader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
-        shader.setVec3("ViewPosition", camera.Position);
-        shader.setMat4("View", camera.getViewMatrix());
-        shader.setMat4("Projection", projectionMatrix);
-
         graph.update(deltaTime);
         updateModelBuffer(modelBuffer);
-        render(vao);
+    });
 
-        std::cout << '\r' << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
+    // rotate camera
+    window.addLifeTimeCallback([&camera](float currentTime) {
+        constexpr float cameraDistance = 3.0f;
+        camera.Position = glm::vec3(glm::cos(currentTime), 1.0f, glm::sin(currentTime)) * cameraDistance;
+    });
 
-        window.display();
-    }
+    // set shader uniforms
+    window.addRenderCallback([&litShader, &camera, &window]() {
+        litShader.use();
+        litShader.setVec3("LightPosition", glm::vec3(0.0f, 1.5f, 0.0f));
+        litShader.setVec3("ViewPosition", camera.Position);
+        litShader.setMat4("View", camera.getViewMatrix());
+        litShader.setMat4("Projection", camera.getProjectionMatrix(window.getAspectRatio()));
+    });
+
+    // render
+    window.addRenderCallback([&postProcess, &vertices, &vao, &window]() {
+        postProcess.begin();
+        render(vertices, vao);
+        postProcess.end();
+        postProcess.render(window.getMousePosition().x);
+    });
+
+    // show fps in window title
+    window.addRenderCallback([&fpsCounter, &window]() {
+        std::ostringstream windowTitle;
+        windowTitle << "Chimpey! ";
+        windowTitle << fpsCounter.getUnit() << ':' << fpsCounter.getValue();
+        window.setTitle(windowTitle.str());
+    });
+
+    window.display();
 
     return EXIT_SUCCESS;
 }
