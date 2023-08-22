@@ -11,6 +11,8 @@ set(SRC
     ${SRCROOT}/Shader.cpp
     ${INCROOT}/Texture2D.hpp
     ${SRCROOT}/Texture2D.cpp
+    ${INCROOT}/Buffers/VertexBuffer.hpp
+    ${SRCROOT}/Buffers/VertexBuffer.cpp
     ${INCROOT}/Buffers/RenderBuffer.hpp
     ${SRCROOT}/Buffers/RenderBuffer.cpp
     ${INCROOT}/Buffers/FrameBuffer.hpp

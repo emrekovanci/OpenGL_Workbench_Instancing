@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 
+#include <Core/Buffers/VertexBuffer.hpp>
 #include <Core/Vertex.hpp>
 #include <Core/Shader.hpp>
 #include <Core/Camera.hpp>
@@ -28,11 +29,11 @@ void displayGpuInfo()
         << "---------------------------------------------\n";
 }
 
-void updateModelBuffer(GLuint modelBuffer)
+void updateModelBuffer(const VertexBuffer& modelBuffer)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Transform) * transforms.size(), transforms.data(), GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    modelBuffer.bind();
+    modelBuffer.fill(transforms);
+    modelBuffer.unbind();
 }
 
 void render(const std::vector<Vertex>& vertices, GLuint vao)
@@ -116,20 +117,18 @@ int main()
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
-    GLuint positionBuffer;
-    glGenBuffers(1, &positionBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+    VertexBuffer positionBuffer(VertexBuffer::Usage::Static);
+    positionBuffer.bind();
+    positionBuffer.fill(vertices);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
-    GLuint modelBuffer;
-    glGenBuffers(1, &modelBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, modelBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Transform) * transforms.size(), transforms.data(), GL_DYNAMIC_DRAW);
+    VertexBuffer modelBuffer(VertexBuffer::Usage::Dynamic);
+    modelBuffer.bind();
+    modelBuffer.fill(transforms);
 
     const GLuint modelMatrixLocation = litShader.getAttribLocation("instanceMatrix");
     for (int i = 0; i < 4; ++i)
